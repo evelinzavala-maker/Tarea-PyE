@@ -1,5 +1,5 @@
 ---
-title: "Ocopaciòn"
+title: "Estatura en metros"
 author: "Evelin Zavala"
 date: "2025-09-17"
 output: html_document
@@ -10,60 +10,87 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ```{r}
-Ocupacion <- c("Desempleado", "Estudiante", "Empleado", "Empleado", "Estudiante", "Empleado", "Empleado", "Empleado", "Jubilado", "Jubilado", "Jubilado", "Jubilado", "Jubilado", "Estudiante", "Desempleado", "Desempleado", "Jubilado", "Empleado", "Estudiante", "Estudiante", "Empleado", "Desempleado", "Estudiante", "Desempleado", "Jubilado", "Empleado", "Jubilado", "Desempleado", "Desempleado", "Desempleado")
-               
+estatura <- c(1.57, 1.97, 1.85, 1.78, 1.62, 1.67, 1.92, 1.96, 1.76,
+              1.94, 1.85, 1.71, 1.65, 1.98, 1.56, 1.84, 1.91, 1.61, 1.8,
+              1.58, 1.7, 1.62, 1.76, 1.84, 1.95, 1.67, 1.62, 1.65, 1.61,
+              1.96, 1.63, 1.75, 1.9, 1.92, 1.79, 1.62, 1.79, 1.57, 1.74,
+              1.55, 1.84, 1.65, 1.84, 1.79, 1.61, 1.54, 1.89, 1.84, 1.76,
+              1.61, 1.59, 1.81, 1.52, 1.61, 1.91, 1.65, 1.51, 1.84, 1.72,
+              1.92, 1.91, 1.93, 1.77, 1.62, 1.88, 1.82, 1.96, 1.66, 1.79,
+              1.88, 1.78, 1.84, 1.69, 1.95, 1.99, 1.88, 1.51, 1.76, 1.16,
+              1.69, 1.72, 1.87, 1.87, 1.66, 1.71, 1.64, 1.81, 1.52, 1.8,
+              1.71, 1.52, 2, 1.81, 1.92, 1.7)
+
 ```
 
 ```{r}
-summary(Ocupacion)
-```
+# Número de clases (Sturges)
+k <- ceiling(1 + 3.322 * log10(length(estatura)))
 
-```{r}
-Ocupacion_ord <- sort(Ocupacion); (Ocupacion_ord)
-```
+# Intervalos de clase
+clases <- cut(estatura, breaks = k)
 
-```{r}
-table(Ocupacion) # Frecuencias
-prop.table(table(Ocupacion)) # Proporciones
-```
+# Frecuencia absoluta
+tabla_frecuencia <- table(clases)
 
-```{r}
+# Frecuencia relativa
+frecuencia_relativa <- prop.table(tabla_frecuencia) * 100
 
-freq <- table(Ocupacion)
-porc <- round(prop.table(freq)*100, 1)
-mi_min <- names(freq)[which.min(freq)]
-(mi_min)
-mi_max <- names(freq)[which.max(freq)]
-(mi_max)
-```
-
-```{r}
-bar_colors <- c("skyblue","blue","pink",
-            "purple")
-
-# Gráfico
-bp <- barplot(freq,
-              col = bar_colors,
-              main = "Ocupacion",
-              xlab = "",
-              ylab = "Frecuencia",
-              ylim = c(0, 50), # << ahora llega hasta 50
-              cex.names = 0.9,
-              space = 0.5
+# Tabla
+tabla <- data.frame(
+  Intervalo = names(tabla_frecuencia),
+  Frecuencia = as.numeric(tabla_frecuencia),
+  Porcentaje = round(frecuencia_relativa, 2)
 )
 
-# Agregar valores encima de cada barra
-text(bp, freq, labels = freq, pos = 3, cex = 1, font = 2)
-text(bp, freq, labels = freq, pos = 3, cex = 0.9, font = 2)
-     
+tabla
+```
+
+
+
+```{r}
+# Media
+media <- mean(estatura)
+
+# Mediana
+mediana <- median(estatura)
+
+# Cuartiles
+cuartiles <- quantile(estatura, probs = c(0.25, 0.5, 0.75))
+
+# Moda como clase modal
+moda_clase <- names(which.max(tabla_frecuencia))
+
+cat("Media:", round(media, 2), "\n")
+cat("Mediana:", round(mediana, 2), "\n")
+cat("Moda (Clase Modal):", moda_clase, "\n")
+cat("Cuartiles:\n")
+print(cuartiles)
 ```
 
 ```{r}
-pie(freq,
-    labels = paste(names(freq), porc, "%"),
-    col = rainbow(length(freq), 0.9),
-    main = "Ocupacion")
+hist(estatura,
+     breaks = k,
+     col = "purple",
+     main = "Histograma de Estatura",
+     xlab = "Estatura (m)",
+     ylab = "Frecuencia")
 ```
+
+```{r}
+# Frecuencia acumulada
+frecuencia_acumulada <- cumsum(tabla_frecuencia)
+
+# Puntos medios de clase
+puntos_clase <- (as.numeric(sub("\\((.+),.*", "\\1", levels(clases))) +
+                 as.numeric(sub(".*,(.+)\\]", "\\1", levels(clases)))) / 2
+
+# Gráfico
+plot(puntos_clase, frecuencia_acumulada, type = "o",
+     col = "blue", main = "Ojiva de Estatura",
+     xlab = "Estatura (m)", ylab = "Frecuencia acumulada")
+```
+
 
 ··##EJercicio 2___________________________-
 
